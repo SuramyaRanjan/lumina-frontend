@@ -22,9 +22,9 @@ export default function App() {
     try {
       // Using the API_URL defined above
       const response = await axios.post(API_URL, {
-        url,
-        ad_content: adContent,
-      });
+    url,
+    ad_content: adContent,
+});
       setResult(response.data);
     } catch (err) {
       console.error("Deployment Error:", err);
