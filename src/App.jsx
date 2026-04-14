@@ -3,6 +3,9 @@ import axios from 'axios';
 import { ArrowRight, Loader2, CheckCircle, Globe, Target, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// This is your live Render backend URL
+const API_URL = "https://lumina-backend-m6yn.onrender.com/personalize";
+
 export default function App() {
   const [url, setUrl] = useState('');
   const [adContent, setAdContent] = useState('');
@@ -10,22 +13,25 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  // IMPORTANT: Replace the URL below with your actual Render URL after deployment
-  const BACKEND_URL = 'https://lumina-backend.onrender.com'; 
-
   const handlePersonalize = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setResult(null);
+
     try {
-      const response = await axios.post(`${BACKEND_URL}/personalize`, {
+      // Using the API_URL defined above
+      const response = await axios.post(API_URL, {
         url,
         ad_content: adContent,
       });
       setResult(response.data);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Server connection failed. Make sure your backend is running.');
+      console.error("Deployment Error:", err);
+      setError(
+        err.response?.data?.detail || 
+        'Connection failed. If the backend is "sleeping," this may take 30s to wake up.'
+      );
     } finally {
       setLoading(false);
     }
@@ -41,9 +47,9 @@ export default function App() {
             <span className="text-xl font-bold tracking-tight">Lumina</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden sm:block h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            <div className={`h-2 w-2 rounded-full ${result ? 'bg-green-500' : 'bg-amber-400'} animate-pulse`} />
             <button className="bg-black text-white px-5 py-2 rounded-xl font-medium hover:bg-gray-800 transition-all active:scale-95 shadow-md">
-              Get Started
+              Beta Access
             </button>
           </div>
         </div>
@@ -65,7 +71,7 @@ export default function App() {
           <div className="flex flex-wrap gap-5 text-sm font-semibold text-gray-500">
             <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100"><CheckCircle size={16} className="text-green-500"/> Ultra Fast</span>
             <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100"><CheckCircle size={16} className="text-green-500"/> No Code</span>
-            <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100"><CheckCircle size={16} className="text-green-500"/> AI Powered</span>
+            <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100"><CheckCircle size={16} className="text-green-500"/> Llama 3.3 Powered</span>
           </div>
         </motion.div>
 
@@ -93,7 +99,7 @@ export default function App() {
 
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2 ml-1">
-                <Target size={14}/> Campaign Hook
+                <Target size={14}/> Campaign Hook / Ad Copy
               </label>
               <input
                 type="text"
@@ -110,7 +116,7 @@ export default function App() {
               className="w-full bg-black text-white py-4 rounded-2xl font-bold flex justify-center items-center gap-3 hover:bg-gray-800 transition-all shadow-xl shadow-gray-200 disabled:opacity-50 active:scale-[0.98]"
             >
               {loading ? (
-                <><Loader2 className="animate-spin" size={20}/> Optimizing...</>
+                <><Loader2 className="animate-spin" size={20}/> AI is Thinking...</>
               ) : (
                 <><Sparkles size={18}/> Generate Optimization</>
               )}
@@ -135,27 +141,27 @@ export default function App() {
               exit={{ opacity: 0 }}
               className="grid md:grid-cols-2 gap-8"
             >
-              {/* Control */}
+              {/* Original Content Card */}
               <div className="bg-white p-8 rounded-[2rem] border border-gray-200 shadow-sm group hover:border-gray-300 transition-all">
-                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 bg-gray-100 inline-block px-3 py-1 rounded-full">Control</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6 bg-gray-100 inline-block px-3 py-1 rounded-full">Control Group</div>
                 <h3 className="text-sm font-bold text-gray-400 uppercase mb-4 tracking-wider">Original Headline</h3>
                 <h2 className="text-2xl font-bold mb-3 text-gray-800">{result.original.h1}</h2>
                 <p className="text-gray-500 leading-relaxed">{result.original.subheadline}</p>
               </div>
 
-              {/* Optimized */}
+              {/* AI Optimized Card */}
               <div className="bg-black text-white p-8 rounded-[2rem] shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
                   <Sparkles size={80}/>
                 </div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-6 bg-white/10 inline-block px-3 py-1 rounded-full">AI Optimized</div>
-                <h3 className="text-sm font-bold text-indigo-300 uppercase mb-4 tracking-wider">Personalized Variant</h3>
+                <div className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-6 bg-white/10 inline-block px-3 py-1 rounded-full">AI Variant</div>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase mb-4 tracking-wider">Personalized Copy</h3>
                 <h2 className="text-2xl font-bold mb-3 leading-tight tracking-tight">{result.personalized.headline}</h2>
                 <p className="text-gray-400 leading-relaxed">{result.personalized.subheadline}</p>
                 
                 <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-6">
                    <div className="flex items-center gap-2 text-xs font-bold text-green-400 uppercase">
-                     <CheckCircle size={14}/> Higher Relevance
+                     <CheckCircle size={14}/> Contextually Matched
                    </div>
                    <ArrowRight className="text-white/20" size={20}/>
                 </div>
@@ -166,7 +172,7 @@ export default function App() {
       </AnimatePresence>
 
       <footer className="text-center text-xs font-bold uppercase tracking-[0.2em] text-gray-400 py-12 border-t border-gray-200">
-        Lumina Engine © 2026 • Optimized for High-Growth Teams
+        Lumina AI Engine © 2026 • Built with Groq & FastAPI
       </footer>
     </div>
   );
